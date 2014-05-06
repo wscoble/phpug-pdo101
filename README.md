@@ -131,3 +131,91 @@ The output should be similar to (your "created has" lines will have different ti
     name has Second Task
     finish_in_days has 3
     created has 2014-05-06 17:19:49
+
+If you want to select records by what the name contains, here's a prepared statement that will do it.
+Notice the use of bindValue instead of bindParam. See _fetch_tasks_like.php_.
+
+    $name_part = '%First%';
+
+    $stmt_fetch_by_name = $db->prepare("SELECT * FROM items WHERE name LIKE :name_part");
+    $stmt_fetch_by_name->bindValue(':name_part', $name_part);
+
+    $stmt_fetch_by_name->execute();
+
+Now we can walk the array just like before:
+
+    $items = $stmt_fetch_all_items->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach($items as $index => $items_array) {
+      foreach($items_array as $field => $value){
+        echo "$field has $value" . PHP_EOL;
+      }
+      echo PHP_EOL;
+    }
+
+And your output should be similar to:
+
+    id has 1
+    name has First Task
+    finish_in_days has
+    created has 2014-05-06 17:19:49
+
+### Updating tasks
+
+Let's say you want to add a _finish_in_days_ value to the first task. Using prepared statements, its pretty easy.
+
+    $stmt_update_finish = $db->prepare("UPDATE items SET finish_in_days=:days WHERE id=:id");
+    $stmt_update_finish->bindParam(':id', $record_id);
+    $stmt_update_finish->bindParam(':days', $days);
+
+    $record_id = 1;
+    $days = 3;
+
+    $stmt_update_finish->execute();
+
+And the record is updated. Now let's fetch the new record. Notice how since _$record_id_ is already in scope, we don't
+have to re-define it.
+
+    $stmt = $db->prepare("SELECT * FROM items WHERE id=:id");
+    $stmt->bindParam(':id', $record_id);
+
+    $stmt->execute();
+
+    foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $key => $item) {
+      foreach($item as $field => $value) {
+        echo "$field has $value" . PHP_EOL;
+      }
+      echo PHP_EOL;
+    }
+
+You should see something like:
+
+    id has 1
+    name has First Task
+    finish_in_days has 3
+    created has 2014-05-06 17:19:49
+
+### Deleting a task
+
+Deleting is just another prepared statement. Here's an example:
+
+    $stmt_delete = $db->prepare("DELETE FROM items WHERE id=:id");
+    $stmt_delete->bindParam(':id', $record_id);
+
+    $record_id = 1;
+
+    $stmt_delete->execute();
+
+Now when you look for that record, it doesn't exist. See
+[PDOStatement::rowCount](http://www.php.net/manual/en/pdostatement.rowcount.php).
+
+    $stmt_count_records = $db->prepare("SELECT * FROM items WHERE id=:id");
+    $stmt_count_records->bindParam(':id', $record_id);
+
+    $stmt_count_records->execute();
+
+    echo "Found " . $stmt_count_records->fetch()[0] . " records." . PHP_EOL;
+
+You should see:
+
+    Found 0 records.

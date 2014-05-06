@@ -1,6 +1,7 @@
 <?php
 
 $db = new PDO('sqlite::memory:');
+//$db = new PDO('sqlite:test.db');
 
 $sql = <<<SQL
        CREATE TABLE IF NOT EXISTS items (
