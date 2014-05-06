@@ -1,4 +1,5 @@
-# Databases for Beginners with PHP and SQLite with PDO
+# SQLite Baby Steps
+## Small Steps for Huge Success
 
 This repository partners with a presentation given to the
 [Las Vegas PHP Users Group](http://www.meetup.com/Las-Vegas-PHP-Users-Group/) on Tuesday, May 6, 2014.
